@@ -4,7 +4,7 @@
     {
         $email    = $_POST["email"];
         $password = $_POST["password"];
-        $hashCode = "$2y$10$0qbAGjiNMNOQDy9UhNnBM.u2PbMbik2qG.vSLCTxYetBcKSoqCxfS";
+        $hashCode = "$2y$10$/FOEaR9DyV1x0z40F1Yjdu37U630rjGmkKbjmHDnv1/xXjhMLoeO2";
         if(password_verify($password, $hashCode))
         {
             echo "login success";
