@@ -1,18 +1,35 @@
 <?php
+require_once "dbconnect.php";
+if(!isset($_SESSION))
+{
+    session_start();
+}
 
     if(isset($_POST["btnlogin"])) //login request
     {
         $email    = $_POST["email"];
         $password = $_POST["password"];
-        $hashCode = "$2y$10$/FOEaR9DyV1x0z40F1Yjdu37U630rjGmkKbjmHDnv1/xXjhMLoeO2";
-        if(password_verify($password, $hashCode))
+        $sql = "select *from admin where email=?";
+        $stmt =$conn->prepare($sql);
+        $stmt=$conn->prepare($sql);
+        $stmt->execute([$email]);
+        $adminInfo = $stmt->fetch();
+        //$errMsg = "";
+        if($adminInfo) {
+            $hashCode = $adminInfo['password'];
+        if(password_verify($password, $hashCode)) // plain text,hashcode
         {
-            echo "login success";
+            $_SESSION['email'] = $email;
         }
-        else{
-            echo "login fail";
+        else{// correct email nad incorrect password
+            $errMsg = "Incorrect password!";
         }
-    echo "$email and $password";
+        }//if end
+        else{//email doesn't exist
+            $errMsg = "Your email does not exist!";
+        }
+        
+ 
     }
 
 ?>
@@ -24,7 +41,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>"
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -36,9 +53,15 @@
         </div>
         <div class="row">
             <div class="col-md-6 mx-auto">
-                <form action="" class="form mt-5">
+                <form action="login.php" class="form mt-5" method="post">
                     <fieldset>
                         <legend>Admin login</legend>
+                        <?php 
+                        if(isset($errMsg)) {
+                        echo "<p class='alert alert-danger'>$errMsg</p>";
+                        unset($errMsg);
+                        }
+                        ?>
                         <div class="mb-1">
                             <label for="" class="form-label" >Email</label>
                             <input type="email" class="form-control" name="email">
